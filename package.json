@@ -1,0 +1,25 @@
+{
+  "type": "module",
+  "name": "med-js-agents",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "basic": "npx tsx basic.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.6.3",
+  "dependencies": {
+    "@langchain/community": "^0.3.37",
+    "@langchain/core": "^0.3.43",
+    "@langchain/langgraph": "^0.2.57",
+    "@langchain/openai": "^0.4.9",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.2"
+  },
+  "resolutions": {
+    "@langchain/core": "^0.3.43"
+  }
+}
