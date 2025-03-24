@@ -5,7 +5,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "basic": "npx tsx basic.ts"
+    "basic": "npx tsx basic.ts",
+    "custom": "npx tsx custom_agent.ts",
+    "structured": "npx tsx structured_output.ts",
+    "parallel": "npx tsx parallelization.ts",
+    "routing": "npx tsx routing.ts",
+    "orchestrator": "npx tsx orchestrator.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +22,7 @@
     "@langchain/langgraph": "^0.2.57",
     "@langchain/openai": "^0.4.9",
     "dotenv": "^16.4.7",
+    "langchain": "^0.3.19",
     "zod": "^3.24.2"
   },
   "resolutions": {
