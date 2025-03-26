@@ -10,18 +10,18 @@ const llm = new ChatOpenAI({
 });
 
 const searchQuerySchema = z.object({
-  searchQuery: z.string().describe("Query that is optimized web search."),
-  justification: z.string().describe("Why this query is relevant to the user's request."),
+  consultaBusqueda: z.string().describe("Consulta optimizada para búsqueda web."),
+  justificacion: z.string().describe("Por qué esta consulta es relevante para la solicitud del usuario."),
 });
 
-// Augment the LLM with schema for structured output
+// Aumentar el LLM con esquema para salida estructurada
 const structuredLlm = llm.withStructuredOutput(searchQuerySchema, {
-  name: "searchQuery",
+  name: "consultaBusqueda",
 });
 
-// Invoke the augmented LLM
+// Invocar el LLM aumentado
 const output = await structuredLlm.invoke(
-  "How does Calcium CT score relate to high cholesterol?"
+  "¿Cómo puedo prevenir el dengue en Medellín durante la temporada de lluvias?"
 );
 
 console.log(output);

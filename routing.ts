@@ -6,10 +6,12 @@ import { ChatOpenAI } from "@langchain/openai";
 import { StateGraph, Annotation } from "@langchain/langgraph";
 import { z } from "zod";
 
-// Schema for structured output to use as routing logic
+import { saveGraphImage } from "./get_graph";
+
+// Esquema para salida estructurada que se usará como lógica de enrutamiento
 const routeSchema = z.object({
-  step: z.enum(["poem", "story", "joke"]).describe(
-    "The next step in the routing process"
+  step: z.enum(["poema", "historia", "chiste"]).describe(
+    "El siguiente paso en el proceso de enrutamiento"
   ),
 });
 
@@ -18,22 +20,22 @@ const llm = new ChatOpenAI({
   temperature: 0,
 });
 
-// Augment the LLM with schema for structured output
+// Aumentar el LLM con esquema para salida estructurada
 const router = llm.withStructuredOutput(routeSchema);
 
-// Graph state
+// Estado del grafo
 const StateAnnotation = Annotation.Root({
   input: Annotation<string>,
   decision: Annotation<string>,
   output: Annotation<string>,
 });
 
-// Nodes
-// Write a story
+// Nodos
+// Escribir una historia
 async function llmCall1(state: typeof StateAnnotation.State) {
   const result = await llm.invoke([{
     role: "system",
-    content: "You are an expert storyteller.",
+    content: "Eres un experto narrador de historias colombianas.",
   }, {
     role: "user",
     content: state.input
@@ -41,11 +43,11 @@ async function llmCall1(state: typeof StateAnnotation.State) {
   return { output: result.content };
 }
 
-// Write a joke
+// Escribir un chiste
 async function llmCall2(state: typeof StateAnnotation.State) {
   const result = await llm.invoke([{
     role: "system",
-    content: "You are an expert comedian.",
+    content: "Eres un experto comediante colombiano.",
   }, {
     role: "user",
     content: state.input
@@ -53,11 +55,11 @@ async function llmCall2(state: typeof StateAnnotation.State) {
   return { output: result.content };
 }
 
-// Write a poem
+// Escribir un poema
 async function llmCall3(state: typeof StateAnnotation.State) {
   const result = await llm.invoke([{
     role: "system",
-    content: "You are an expert poet.",
+    content: "Eres un experto poeta colombiano.",
   }, {
     role: "user",
     content: state.input
@@ -66,11 +68,11 @@ async function llmCall3(state: typeof StateAnnotation.State) {
 }
 
 async function llmCallRouter(state: typeof StateAnnotation.State) {
-  // Route the input to the appropriate node
+  // Enrutar la entrada al nodo apropiado
   const decision = await router.invoke([
     {
       role: "system",
-      content: "Route the input to story, joke, or poem based on the user's request."
+      content: "Enruta la entrada a historia, chiste o poema basado en la solicitud del usuario."
     },
     {
       role: "user",
@@ -81,21 +83,21 @@ async function llmCallRouter(state: typeof StateAnnotation.State) {
   return { decision: decision.step };
 }
 
-// Conditional edge function to route to the appropriate node
+// Función de borde condicional para enrutar al nodo apropiado
 function routeDecision(state: typeof StateAnnotation.State) {
-  // Return the node name you want to visit next
-  if (state.decision === "story") {
+  // Devolver el nombre del nodo que quieres visitar a continuación
+  if (state.decision === "historia") {
     return "llmCall1";
-  } else if (state.decision === "joke") {
+  } else if (state.decision === "chiste") {
     return "llmCall2";
-  } else if (state.decision === "poem") {
+  } else if (state.decision === "poema") {
     return "llmCall3";
   }
-  // Default case - if none of the above conditions match
-  return "llmCall1"; // Default to story as a fallback
+  // Caso por defecto - si ninguna de las condiciones anteriores coincide
+  return "llmCall1"; // Por defecto, historia como respaldo
 }
 
-// Build workflow
+// Construir flujo de trabajo
 const routerWorkflow = new StateGraph(StateAnnotation)
   .addNode("llmCall1", llmCall1)
   .addNode("llmCall2", llmCall2)
@@ -112,8 +114,11 @@ const routerWorkflow = new StateGraph(StateAnnotation)
   .addEdge("llmCall3", "__end__")
   .compile();
 
-// Invoke
+// Save the graph image
+await saveGraphImage(routerWorkflow, "imgs/routing.png");
+
+// Invocar
 const state = await routerWorkflow.invoke({
-  input: "Write me a joke about cats"
+  input: "Cuéntame un chiste sobre el metro de Medellín"
 });
 console.log(state.output);

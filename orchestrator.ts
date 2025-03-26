@@ -5,17 +5,18 @@ import { ChatOpenAI } from "@langchain/openai";
 import { Annotation, StateGraph, Send } from "@langchain/langgraph";
 
 import { z } from "zod";
+import { saveGraphImage } from "./get_graph";
 
-// Schema for structured output to use in planning
+// Esquema para salida estructurada a usar en la planificación
 const sectionSchema = z.object({
-  name: z.string().describe("Name for this section of the report."),
-  description: z.string().describe(
-    "Brief overview of the main topics and concepts to be covered in this section."
+  nombre: z.string().describe("Nombre para esta sección del informe."),
+  descripcion: z.string().describe(
+    "Breve descripción de los principales temas y conceptos que se cubrirán en esta sección."
   ),
 });
 
 const sectionsSchema = z.object({
-  sections: z.array(sectionSchema).describe("Sections of the report."),
+  secciones: z.array(sectionSchema).describe("Secciones del informe."),
 });
 
 const llm = new ChatOpenAI({
@@ -23,76 +24,76 @@ const llm = new ChatOpenAI({
   temperature: 1,
 });
 
-// Augment the LLM with schema for structured output
+// Aumentar el LLM con esquema para salida estructurada
 const planner = llm.withStructuredOutput(sectionsSchema);
 
-// Graph state
+// Estado del grafo
 const StateAnnotation = Annotation.Root({
-  topic: Annotation<string>,
-  sections: Annotation<Array<z.infer<typeof sectionSchema>>>,
-  completedSections: Annotation<string[]>({
+  tema: Annotation<string>,
+  secciones: Annotation<Array<z.infer<typeof sectionSchema>>>,
+  seccionesCompletadas: Annotation<string[]>({
     default: () => [],
     reducer: (a, b) => a.concat(b),
   }),
-  finalReport: Annotation<string>,
+  informeFinal: Annotation<string>,
 });
 
-// Worker state
+// Estado del trabajador
 const WorkerStateAnnotation = Annotation.Root({
-  section: Annotation<z.infer<typeof sectionSchema>>,
-  completedSections: Annotation<string[]>({
+  seccion: Annotation<z.infer<typeof sectionSchema>>,
+  seccionesCompletadas: Annotation<string[]>({
     default: () => [],
     reducer: (a, b) => a.concat(b),
   }),
 });
 
-// Nodes
+// Nodos
 async function orchestrator(state: typeof StateAnnotation.State) {
-  // Generate queries
-  const reportSections = await planner.invoke([
-    { role: "system", content: "Generate a plan for the report." },
-    { role: "user", content: `Here is the report topic: ${state.topic}` },
+  // Generar consultas
+  const seccionesInforme = await planner.invoke([
+    { role: "system", content: "Genera un plan para el informe en español." },
+    { role: "user", content: `Aquí está el tema del informe: ${state.tema}` },
   ]);
 
-  return { sections: reportSections.sections };
+  return { secciones: seccionesInforme.secciones };
 }
 
 async function llmCall(state: typeof WorkerStateAnnotation.State) {
-  // Generate section
-  const section = await llm.invoke([
+  // Generar sección
+  const seccion = await llm.invoke([
     {
       role: "system",
-      content: "Write a report section following the provided name and description. Include no preamble for each section. Use markdown formatting.",
+      content: "Escribe una sección de informe siguiendo el nombre y descripción proporcionados. No incluyas preámbulo para cada sección. Usa formato markdown. Escribe en español.",
     },
     {
       role: "user",
-      content: `Here is the section name: ${state.section.name} and description: ${state.section.description}`,
+      content: `Aquí está el nombre de la sección: ${state.seccion.nombre} y la descripción: ${state.seccion.descripcion}`,
     },
   ]);
 
-  // Write the updated section to completed sections
-  return { completedSections: [section.content] };
+  // Escribir la sección actualizada a secciones completadas
+  return { seccionesCompletadas: [seccion.content] };
 }
 
 async function synthesizer(state: typeof StateAnnotation.State) {
-  // List of completed sections
-  const completedSections = state.completedSections;
+  // Lista de secciones completadas
+  const seccionesCompletadas = state.seccionesCompletadas;
 
-  // Format completed section to str to use as context for final sections
-  const completedReportSections = completedSections.join("\n\n---\n\n");
+  // Formatear sección completada a str para usar como contexto para secciones finales
+  const seccionesInformeCompletadas = seccionesCompletadas.join("\n\n---\n\n");
 
-  return { finalReport: completedReportSections };
+  return { informeFinal: seccionesInformeCompletadas };
 }
 
-// Conditional edge function to create llm_call workers that each write a section of the report
+// Función de borde condicional para crear trabajadores llm_call que escriban cada sección del informe
 function assignWorkers(state: typeof StateAnnotation.State) {
-  // Kick off section writing in parallel via Send() API
-  return state.sections.map((section) =>
-    new Send("llmCall", { section })
+  // Iniciar la escritura de secciones en paralelo a través de la API Send()
+  return state.secciones.map((seccion) =>
+    new Send("llmCall", { seccion })
   );
 }
 
-// Build workflow
+// Construir flujo de trabajo
 const orchestratorWorker = new StateGraph(StateAnnotation)
   .addNode("orchestrator", orchestrator)
   .addNode("llmCall", llmCall)
@@ -107,8 +108,11 @@ const orchestratorWorker = new StateGraph(StateAnnotation)
   .addEdge("synthesizer", "__end__")
   .compile();
 
-// Invoke
+// Save the graph image
+await saveGraphImage(orchestratorWorker, "imgs/orchestrator.png");
+
+// Invocar
 const state = await orchestratorWorker.invoke({
-  topic: "Create a report on LLM scaling laws"
+  tema: "Crear un informe sobre el sistema de transporte público en Medellín"
 });
-console.log(state.finalReport);
+console.log(state.informeFinal);

@@ -1,14 +1,14 @@
 /**
- * This file defines the tools available to the ReAct agent.
- * Tools are functions that the agent can use to interact with external systems or perform specific tasks.
+ * Este archivo define las herramientas disponibles para el agente ReAct.
+ * Las herramientas son funciones que el agente puede usar para interactuar con sistemas externos o realizar tareas específicas.
  */
 import { tool } from "@langchain/core/tools";
 import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 import { number, object } from "zod";
 
 /**
- * Tavily search tool configuration
- * This tool allows the agent to perform web searches using the Tavily API.
+ * Configuración de la herramienta de búsqueda Tavily
+ * Esta herramienta permite al agente realizar búsquedas web utilizando la API de Tavily.
  */
 const mathSchema = object({
   num1: number(),
@@ -17,62 +17,62 @@ const mathSchema = object({
 
 const multiply = tool(({ num1, num2 }: { num1: number; num2: number }): number => {
   /**
-   * Multiplies two numbers
+   * Multiplica dos números
    */
   return num1 * num2;
 }, {
   name: "multiply",
-  description: "Multiplies two numbers",
+  description: "Multiplica dos números",
   schema: mathSchema,
 });
 
 const add = tool(({ num1, num2 }: { num1: number; num2: number }): number => {
   /**
-   * Adds two numbers
+   * Suma dos números
    */
   return num1 + num2;
 }, {
   name: "add",
-  description: "Adds two numbers",
+  description: "Suma dos números",
   schema: mathSchema,
 });
 
 const subtract = tool(({ num1, num2 }: { num1: number; num2: number }): number => {
   /**
-   * Subtracts two numbers
+   * Resta dos números
    */
   return num1 - num2;
 }, {
   name: "subtract",
-  description: "Subtracts two numbers",
+  description: "Resta dos números",
   schema: mathSchema,
 });
 
 const divide = tool(({ num1, num2 }: { num1: number; num2: number }): number => {
   /**
-   * Divides two numbers
+   * Divide dos números
    */
   return num1 / num2;
 }, {
   name: "divide",
-  description: "Divides two numbers",
+  description: "Divide dos números",
   schema: mathSchema,
 });
 
 const modulo = tool(({ num1, num2 }: { num1: number; num2: number }): number => {
   /**
-   * Modulo two numbers
+   * Calcula el módulo de dos números
    */
   return num1 % num2;
 }, {
   name: "modulo",
-  description: "Modulo two numbers",
+  description: "Calcula el módulo de dos números",
   schema: mathSchema,
 });
 
 /**
- * Creates and returns all available tools for the agent
- * This function should be called after environment variables are loaded
+ * Crea y devuelve todas las herramientas disponibles para el agente
+ * Esta función debe ser llamada después de que las variables de entorno sean cargadas
  */
 export function createTools() {
   const searchTavily = new TavilySearchResults({
@@ -80,7 +80,7 @@ export function createTools() {
   });
 
   /**
-   * Return an array of all available tools
+   * Devuelve un array de todas las herramientas disponibles
    */
   return [searchTavily, multiply, add, subtract, divide, modulo];
 }
