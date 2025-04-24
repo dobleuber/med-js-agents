@@ -6,22 +6,18 @@ import { z } from "zod";
 
 const llm = new ChatOpenAI({
   model: "gpt-4o-mini",
-  temperature: 0,
+  temperature: 1,
 });
 
-const searchQuerySchema = z.object({
-  consultaBusqueda: z.string().describe("Consulta optimizada para búsqueda web."),
-  justificacion: z.string().describe("Por qué esta consulta es relevante para la solicitud del usuario."),
+const joke = z.object({
+  setup: z.string().describe("La premisa del chiste"),
+  punchline: z.string().describe("El remate del chiste"),
+  rating: z.number().optional().describe("La calificación del chiste, de 1 a 10"),
 });
 
-// Aumentar el LLM con esquema para salida estructurada
-const structuredLlm = llm.withStructuredOutput(searchQuerySchema, {
-  name: "consultaBusqueda",
-});
+const structuredLlm = llm.withStructuredOutput(joke);
 
 // Invocar el LLM aumentado
-const output = await structuredLlm.invoke(
-  "¿Cómo puedo prevenir el dengue en Medellín durante la temporada de lluvias?"
-);
+const output = await structuredLlm.invoke("Dime un chiste sobre gatos");
 
 console.log(output);

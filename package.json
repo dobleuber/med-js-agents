@@ -10,7 +10,8 @@
     "structured": "npx tsx structured_output.ts",
     "parallel": "npx tsx parallelization.ts",
     "routing": "npx tsx routing.ts",
-    "orchestrator": "npx tsx orchestrator.ts"
+    "orchestrator": "npx tsx orchestrator.ts",
+    "human": "npx tsx human.ts"
   },
   "keywords": [],
   "author": "",
