@@ -15,7 +15,7 @@
   },
   "keywords": ["langchain", "langgraph", "agents", "typescript"],
   "author": "Wbert Adrian Castro Vera <dobleuber@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.6.3",
   "dependencies": {
     "@langchain/community": "^0.3.37",
