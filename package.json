@@ -2,7 +2,7 @@
   "type": "module",
   "name": "med-js-agents",
   "version": "1.0.0",
-  "description": "",
+  "description": "Source code for the LangGraph Agents talk at MedellinJS",
   "main": "index.js",
   "scripts": {
     "basic": "npx tsx basic.ts",
@@ -13,8 +13,8 @@
     "orchestrator": "npx tsx orchestrator.ts",
     "human": "npx tsx human.ts"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["langchain", "langgraph", "agents", "typescript"],
+  "author": "Wbert Adrian Castro Vera <dobleuber@gmail.com>",
   "license": "ISC",
   "packageManager": "pnpm@10.6.3",
   "dependencies": {
