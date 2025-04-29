@@ -28,5 +28,8 @@
   },
   "resolutions": {
     "@langchain/core": "^0.3.43"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3"
   }
 }
