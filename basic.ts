@@ -26,7 +26,7 @@ const agentFinalState = await agent.invoke(
 );
 
 // Save the graph image
-await saveGraphImage(agent, "imgs/basic.png");
+// await saveGraphImage(agent, "imgs/basic.png");
 
 
 console.log(
